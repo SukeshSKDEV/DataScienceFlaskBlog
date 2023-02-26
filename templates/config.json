@@ -9,6 +9,8 @@
     "tw_url": "https://twitter.com/datascienceblog",
     "gh_url": "https://github.com/datascienceblog",
     "gmail-user": "sukeshskdev@gmail.com",
-    "gmail-password": "stutbrcqabsrczql"
+    "gmail-password": "stutbrcqabsrczql",
+    "about_text": "Hi My name is Sukesh and This is my Data Science blog website.",
+    "no_of_posts": 5
   }
 }
