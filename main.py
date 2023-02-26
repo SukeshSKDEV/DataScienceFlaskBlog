@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request
+import json
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@localhost/data_science'
+
+with open('templates/config.json', "r") as c:
+    params=json.load(c)["params"]
+
+app.config["SQLALCHEMY_DATABASE_URI"] = params['local_uri']
 db = SQLAlchemy(app)
 
 '''sno name phone_num msg date email'''
@@ -20,7 +25,7 @@ class Contacts(db.Model):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html',params=params)
 
 @app.route('/about')
 def about():
