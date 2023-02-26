@@ -83,5 +83,13 @@ def post_route(post_slug):
     post=Posts.query.filter_by(slug=post_slug).first()
     return render_template('post.html',params=params,post=post)
 
+@app.route('/dashboard',methods=['GET','POST'])
+def login_dashboard():
+    if request.method=='POST':
+        pass
+         # REDIRECT TO ADMIN PANEL
+    else:
+        return render_template('login.html',params=params)
+
 if __name__ == "__main__":
     app.run(debug=True)
