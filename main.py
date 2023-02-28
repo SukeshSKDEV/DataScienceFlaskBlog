@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect
+from werkzeug.utils import secure_filename
 import json
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mail import Mail
+import os
 
 with open('templates/config.json', "r") as c:
     params=json.load(c)["params"]
@@ -10,7 +12,8 @@ with open('templates/config.json', "r") as c:
 local_server=True
 
 app = Flask(__name__)
-
+app.secret_key = 'super secret key'
+app.config['UPLOAD_FOLDER'] = params['upload_location']
 # configuration of mail
 app.config.update(MAIL_SERVER="smtp.gmail.com",
                   MAIL_PORT=465,
@@ -75,7 +78,6 @@ def contact():
                           sender=email,
                           recipients=[params['gmail-user']],
                           body=message+"\n"+phone)
-
     return render_template('contact.html',params=params)
 
 @app.route('/post/<string:post_slug>',methods=['GET'])
@@ -83,13 +85,73 @@ def post_route(post_slug):
     post=Posts.query.filter_by(slug=post_slug).first()
     return render_template('post.html',params=params,post=post)
 
+@app.route('/edit/<string:sno>',methods=['GET','POST'])
+def edit(sno):
+    if 'user' in session and session['user'] == params['admin_user']:
+        if request.method=='POST':
+            box_title=request.form.get('title')
+            tline=request.form.get('tline')
+            content=request.form.get('content')
+            slug=request.form.get('slug')
+            img_file=request.form.get('img_file')
+            date=datetime.now()
+
+            if sno=='0':
+                post=Posts(title=box_title,slug=slug,content=content, tagline=tline,img_file=img_file,date=date)
+                db.session.add(post)
+                db.session.commit()
+            else:
+                post=Posts.query.filter_by(sno=sno).first()
+                post.title=box_title
+                post.tagline=tline
+                post.content=content
+                post.slug=slug
+                post.img_file=img_file
+                post.date=date
+                db.session.commit()
+                return redirect('/edit/'+sno)
+        post = Posts.query.filter_by(sno=sno).first()
+        return render_template('edit.html', params=params, post=post)
 @app.route('/dashboard',methods=['GET','POST'])
 def login_dashboard():
+    if 'user' in session and session['user']==params['admin_user']:
+        posts=Posts.query.all()
+        return render_template('dashboard.html',params=params,posts=posts)
+
     if request.method=='POST':
-        pass
-         # REDIRECT TO ADMIN PANEL
+        username=request.form.get('uname')
+        password=request.form.get('pass')
+        # REDIRECT TO ADMIN PANEL
+        if username==params['admin_user'] and password==params['admin_password']:
+            # set the session variable
+            session['user']=username
+            posts=Posts.query.all()
+            return render_template('dashboard.html',params=params,posts=posts)
     else:
         return render_template('login.html',params=params)
+
+@app.route('/uploader',methods=['GET','POST'])
+def uploader():
+    if 'user' in session and session['user'] == params['admin_user']:
+        if request.method=='POST':
+            f=request.files['fileupload']
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+        return "Uploaded successfully"
+
+@app.route('/delete/<string:sno>',methods=['GET','POST'])
+def delete(sno):
+    if 'user' in session and session['user'] == params['admin_user']:
+            post=Posts.query.filter_by(sno=sno).first()
+            db.session.delete(post)
+            db.session.commit()
+    return redirect('/dashboard')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user')
+    return redirect('/dashboard')
+
 
 if __name__ == "__main__":
     app.run(debug=True)

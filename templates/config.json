@@ -14,6 +14,7 @@
     "no_of_posts": 5,
     "login_img": "data-science.png",
     "admin_user":"sukesh",
-    "admin_password": "sukeshdatascienceblog"
+    "admin_password": "sukeshdatascienceblog",
+    "upload_location": "C:\\Users\\Asus\\PycharmProjects\\DataScienceBLog\\static\\assets\\img\\"
   }
 }
