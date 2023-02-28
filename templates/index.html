@@ -30,7 +30,7 @@
                         <p class="post-meta">
                             Posted by
                             <a href="#!">Admin</a>
-                            on post.date
+                            on {{post.date}}
                         </p>
                     </div>
                     {{post.content[0:150]}}.....
@@ -39,7 +39,10 @@
                     <hr class="my-4" />
                 {% endfor %}
                     <!-- Pager-->
-                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a></div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <a class="btn btn-primary text-uppercase" href="{{prev}}">&larr; Previous</a>
+                        <a class="btn btn-primary text-uppercase" href="{{next}}">Next &rarr;</a>
+                    </div>
                 </div>
             </div>
         </div>
