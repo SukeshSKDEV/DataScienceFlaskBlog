@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, flash
 from werkzeug.utils import secure_filename
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -104,6 +104,7 @@ def contact():
                           sender=email,
                           recipients=[params['gmail-user']],
                           body=message+"\n"+phone)
+        flash('Thanks for submitting your details. We will get back to you soon.','success')
     return render_template('contact.html',params=params)
 
 @app.route('/post/<string:post_slug>',methods=['GET'])
